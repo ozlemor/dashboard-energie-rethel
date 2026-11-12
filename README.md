@@ -1,6 +1,6 @@
 # Dashboard – Consommation électrique (Rethel)
 
-**👉 En ligne : https://dashboard-energie-rethel.onrender.com**
+**En ligne : https://dashboard-energie-rethel.onrender.com**
 (plan gratuit : le premier chargement peut prendre 30 à 60 secondes)
 
 Projet du module **Visualisation interactive** (MSc2 DATA) : dashboard Dash qui réunit
