@@ -1,0 +1,9 @@
+# Base SQLite : recréée à chaque démarrage, ne jamais la mettre sur GitHub
+*.db
+
+# Fichiers Excel d'origine : remplacés par les CSV
+data/*.xlsx
+
+# Fichiers temporaires de Python et du Mac
+__pycache__/
+.DS_Store
