@@ -244,6 +244,11 @@ app = Dash(__name__)
 app.title = "Consommation électrique — Rethel"
 server = app.server           # TP5 : c'est cette variable que gunicorn lance sur Render
 
+
+# TP5 : premier chargement des données dès le démarrage (et pas à la 1re visite),
+# pour que la page s'affiche tout de suite, même sur le petit serveur de Render.
+charger_donnees()
+
 STYLE_BLOC = {"background": "white", "borderRadius": "8px", "padding": "10px",
                "boxShadow": "0 1px 4px rgba(0,0,0,0.15)"}
 

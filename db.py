@@ -29,17 +29,30 @@ def executer(requete, parametres=()):
 
 
 def synthese_par_site():
-    """Une ligne par consommateur : type, position, énergie, facture, part HC, prix moyen."""
-    requete = f"""
-        SELECT c.id_consommateur                                   AS site,
+    """Une ligne par consommateur : type, position, énergie, facture, part HC, prix moyen.
+    Optimisation (TP5) : on additionne d'abord l'énergie par site et par heure
+    (1 million de relevés -> 240 lignes), puis on applique le tarif sur ces 240 lignes.
+    Résultat identique, mais beaucoup plus rapide sur le petit serveur gratuit de Render."""
+    requete = """
+        WITH energie_par_heure AS (
+            SELECT id_consommateur,
+                   CAST(substr(horodatage, 12, 2) AS INTEGER) AS heure,     -- 'AAAA-MM-JJ HH:MM:SS' -> HH
+                   SUM(puissance_kw * 5.0 / 60)               AS energie_kWh
+            FROM releves
+            GROUP BY id_consommateur, heure
+        )
+        SELECT c.id_consommateur                                           AS site,
                c.type,
-               c.latitude                                          AS lat,
-               c.longitude                                         AS lon,
-               SUM(r.puissance_kw * 5.0 / 60)                      AS energie_kWh,
-               SUM(CASE WHEN t.plage = 'HC' THEN r.puissance_kw * 5.0 / 60 ELSE 0 END) AS energie_HC_kWh,
-               SUM(r.puissance_kw * 5.0 / 60 * t.prix_kwh)         AS cout_EUR
-        FROM releves r
-        {JOINTURE_TARIF}
+               c.latitude                                                  AS lat,
+               c.longitude                                                 AS lon,
+               SUM(e.energie_kWh)                                          AS energie_kWh,
+               SUM(CASE WHEN t.plage = 'HC' THEN e.energie_kWh ELSE 0 END) AS energie_HC_kWh,
+               SUM(e.energie_kWh * t.prix_kwh)                             AS cout_EUR
+        FROM energie_par_heure e
+        JOIN consommateurs c ON c.id_consommateur = e.id_consommateur
+        JOIN tarifs t        ON t.id_contrat = c.id_contrat
+                            AND e.heure >= t.heure_debut
+                            AND e.heure <  t.heure_fin
         GROUP BY c.id_consommateur, c.type, c.latitude, c.longitude
         ORDER BY c.id_consommateur
     """
